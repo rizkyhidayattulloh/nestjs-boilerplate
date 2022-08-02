@@ -23,7 +23,7 @@ export class UserService {
     async store(data: UserStoreDto): Promise<User> {
         const user = this.userRepository.create(data);
 
-        if (data.password) user.password = await hash(data.password);
+        if (data.password) user.password = hash(data.password);
 
         try {
             await this.userRepository.save(user);
