@@ -1,5 +1,5 @@
-import { registerAs } from "@nestjs/config"
-import { TypeOrmModuleOptions } from "@nestjs/typeorm"
+import { registerAs } from '@nestjs/config';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 export default registerAs('database', (): TypeOrmModuleOptions => {
     return {
@@ -11,5 +11,5 @@ export default registerAs('database', (): TypeOrmModuleOptions => {
         database: process.env.DB_DATABASE,
         autoLoadEntities: true,
         synchronize: process.env.APP_ENV !== 'production'
-    }
-})
+    };
+});
