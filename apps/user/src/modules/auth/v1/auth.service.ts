@@ -35,7 +35,7 @@ export class AuthService {
     }
 
     async register(data: RegisterDto): Promise<object> {
-        await this.userService.store(data);
+        this.userService.store(data);
 
         return {};
     }
