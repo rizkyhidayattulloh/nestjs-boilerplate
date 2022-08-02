@@ -1,8 +1,13 @@
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import {
+    BadRequestException,
+    ValidationPipe,
+    VersioningType
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { useContainer } from 'class-validator';
+import { useContainer, ValidationError } from 'class-validator';
+import { BadRequestExceptionFilter } from 'common/exception-filters/bad-request-exception.filter';
 import { TransformDataInterceptor } from 'common/interceptors/transform-data.interceptor';
 import helmet from 'helmet';
 import { AppModule } from './modules/app.module';
@@ -24,9 +29,14 @@ async function bootstrap() {
 
     app.useGlobalPipes(
         new ValidationPipe({
-            stopAtFirstError: true
+            stopAtFirstError: true,
+            exceptionFactory: (errors: ValidationError[] = []) => {
+                return new BadRequestException(errors);
+            }
         })
     );
+
+    app.useGlobalFilters(new BadRequestExceptionFilter());
 
     const config = app.get(ConfigService);
 
