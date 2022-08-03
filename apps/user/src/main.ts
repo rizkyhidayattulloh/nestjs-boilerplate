@@ -10,6 +10,7 @@ import { useContainer, ValidationError } from 'class-validator';
 import { BadRequestExceptionFilter } from 'common/exception-filters/bad-request-exception.filter';
 import { TransformDataInterceptor } from 'common/interceptors/transform-data.interceptor';
 import helmet from 'helmet';
+import { middleware as expressCtx } from 'express-ctx';
 import { AppModule } from './modules/app.module';
 
 async function bootstrap() {
@@ -37,6 +38,8 @@ async function bootstrap() {
     );
 
     app.useGlobalFilters(new BadRequestExceptionFilter());
+
+    app.use(expressCtx);
 
     const config = app.get(ConfigService);
 

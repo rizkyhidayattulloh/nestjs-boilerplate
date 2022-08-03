@@ -1,5 +1,5 @@
 import { IsEmail, IsNotEmpty } from 'class-validator';
-import { IsUnique } from 'common/validators/unique.validator';
+import { IsUnique } from 'common/decorators/validator.decorator';
 import { User } from 'modules/user/user.entity';
 
 export class RegisterDto {

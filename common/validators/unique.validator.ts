@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {
-    registerDecorator,
     ValidationArguments,
-    ValidationOptions,
     ValidatorConstraint,
     ValidatorConstraintInterface
 } from 'class-validator';
@@ -32,21 +30,4 @@ export class UniqueValidator implements ValidatorConstraintInterface {
     defaultMessage(validationArguments?: ValidationArguments): string {
         return `${validationArguments.property} alredy used`;
     }
-}
-
-export function IsUnique(
-    entity: object,
-    uniqueField: string,
-    validationOptions?: ValidationOptions
-) {
-    return function (object: any, propertyName: string) {
-        registerDecorator({
-            name: 'IsUnique',
-            target: object.constructor,
-            propertyName,
-            options: validationOptions,
-            constraints: [entity, uniqueField],
-            validator: UniqueValidator
-        });
-    };
 }

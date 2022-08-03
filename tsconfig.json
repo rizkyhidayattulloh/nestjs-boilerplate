@@ -20,7 +20,8 @@
         "paths": {
             "apps/*": ["./apps/*"],
             "modules/*": ["./modules/*"],
-            "common/*": ["./common/*"]
+            "common/*": ["./common/*"],
+            "providers/*": ["./providers/*"]
         }
     }
 }
