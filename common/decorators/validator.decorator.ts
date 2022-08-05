@@ -4,6 +4,7 @@ import { UniqueValidator } from 'common/validators/unique.validator';
 export function IsUnique(
     entity: object,
     uniqueField: string,
+    exceptColumn?: string,
     validationOptions?: ValidationOptions
 ) {
     return function (object: any, propertyName: string) {
@@ -12,7 +13,7 @@ export function IsUnique(
             target: object.constructor,
             propertyName,
             options: validationOptions,
-            constraints: [entity, uniqueField],
+            constraints: [entity, uniqueField, exceptColumn],
             validator: UniqueValidator
         });
     };

@@ -4,7 +4,8 @@ import {
     ValidatorConstraint,
     ValidatorConstraintInterface
 } from 'class-validator';
-import { DataSource } from 'typeorm';
+import { ContextProvider } from 'providers/context.provider';
+import { DataSource, FindManyOptions, Not } from 'typeorm';
 
 @Injectable()
 @ValidatorConstraint({ name: 'unique', async: true })
@@ -15,19 +16,28 @@ export class UniqueValidator implements ValidatorConstraintInterface {
         value: any,
         validationArguments?: ValidationArguments
     ): Promise<boolean> {
-        const [entityClass, uniqueField = validationArguments.property] =
-            validationArguments.constraints;
+        const [
+            entityClass,
+            uniqueField = validationArguments.property,
+            exceptColumn
+        ] = validationArguments.constraints;
 
-        return (
-            (await this.dataSource.getRepository(entityClass).count({
-                where: {
-                    [uniqueField]: value
-                }
-            })) <= 0
-        );
+        const repository = this.dataSource.getRepository(entityClass);
+
+        let findCondition = {
+            [uniqueField]: value
+        };
+
+        if (exceptColumn) {
+            findCondition[exceptColumn] = Not(
+                (validationArguments.object as any)[exceptColumn]
+            );
+        }
+
+        return (await repository.count({ where: findCondition })) <= 0;
     }
 
     defaultMessage(validationArguments?: ValidationArguments): string {
-        return `${validationArguments.property} alredy used`;
+        return `${validationArguments.property} alredy exists`;
     }
 }
