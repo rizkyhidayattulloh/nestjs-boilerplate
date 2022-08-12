@@ -4,7 +4,7 @@ import { Factory, Seeder } from 'typeorm-seeding';
 
 export default class UserSeeder implements Seeder {
     public async run(factory: Factory, dataSource: DataSource): Promise<any> {
-        const users = await factory(User)().makeMany(10);
+        const users = await factory(User)().makeMany(1000);
 
         await dataSource
             .createQueryBuilder()

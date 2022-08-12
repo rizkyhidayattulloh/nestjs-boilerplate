@@ -1,9 +1,7 @@
-import {
-    BadRequestException,
-    Injectable,
-    InternalServerErrorException
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AbstractService } from 'common/abstract/abstract.service';
+import { PageDto, PageOptionsDto } from 'common/dtos/pagination/page.dto';
 import { hash } from 'common/util';
 import { FindOneOptions, Repository } from 'typeorm';
 import { UserStoreDto } from './dto/user-store.dto';
@@ -11,18 +9,22 @@ import { UserUpdateDto } from './dto/user-update-dto';
 import { User } from './user.entity';
 
 @Injectable()
-export class UserService {
+export class UserService extends AbstractService<User> {
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>
-    ) {}
-
-    async find(options: FindOneOptions<User>): Promise<User> {
-        return this.userRepository.findOne(options);
+    ) {
+        super(userRepository, 'user');
     }
 
-    async findByColumn(value: string, column: string): Promise<User> {
-        return this.userRepository.findOne({ where: { [column]: value } });
+    async getUsers(pageOptionsDto: PageOptionsDto): Promise<PageDto<User>> {
+        const query = this.getQuery();
+
+        return this.setQuery(query).paginate(pageOptionsDto);
+    }
+
+    async findUser(options: FindOneOptions<User>): Promise<User> {
+        return this.userRepository.findOne(options);
     }
 
     async store(data: UserStoreDto): Promise<User> {

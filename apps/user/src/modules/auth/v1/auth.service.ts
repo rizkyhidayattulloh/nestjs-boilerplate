@@ -16,8 +16,9 @@ export class AuthService {
 
     async login(data: LoginDto): Promise<ILoginResponse> {
         const { email, password } = data;
-        const user = await this.userService.find({
-            where: { email }
+        const user = await this.userService.findByColumns({
+            column: 'email',
+            value: email
         });
 
         if (!user) throw new BadRequestException('invalid credential');

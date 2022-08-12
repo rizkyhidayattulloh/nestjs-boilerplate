@@ -1,14 +1,15 @@
 import {
-    BadRequestException,
+    ClassSerializerInterceptor,
+    HttpStatus,
+    UnprocessableEntityException,
     ValidationPipe,
     VersioningType
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { useContainer, ValidationError } from 'class-validator';
-import { BadRequestExceptionFilter } from 'common/exception-filters/bad-request-exception.filter';
-import { TransformDataInterceptor } from 'common/interceptors/transform-data.interceptor';
+import { useContainer } from 'class-validator';
+import { UnprocessableEntityExceptionFilter } from 'common/exception-filters/http-exception.filter';
 import helmet from 'helmet';
 import { middleware as expressCtx } from 'express-ctx';
 import { AppModule } from './modules/app.module';
@@ -18,11 +19,13 @@ async function bootstrap() {
         cors: true
     });
 
+    const reflector = app.get(Reflector);
+
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
     app.use(helmet());
 
-    app.useGlobalInterceptors(new TransformDataInterceptor());
+    app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
 
     app.enableVersioning({
         type: VersioningType.URI
@@ -31,13 +34,14 @@ async function bootstrap() {
     app.useGlobalPipes(
         new ValidationPipe({
             stopAtFirstError: true,
-            exceptionFactory: (errors: ValidationError[] = []) => {
-                return new BadRequestException(errors);
-            }
+            transform: true,
+            errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+            exceptionFactory: (errors) =>
+                new UnprocessableEntityException(errors)
         })
     );
 
-    app.useGlobalFilters(new BadRequestExceptionFilter());
+    app.useGlobalFilters(new UnprocessableEntityExceptionFilter());
 
     app.use(expressCtx);
 

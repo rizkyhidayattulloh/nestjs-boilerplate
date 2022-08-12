@@ -1,15 +1,15 @@
 import {
     ArgumentsHost,
-    BadRequestException,
     Catch,
     ExceptionFilter,
+    UnprocessableEntityException,
     ValidationError
 } from '@nestjs/common';
 import { Response } from 'express';
 
-@Catch(BadRequestException)
-export class BadRequestExceptionFilter implements ExceptionFilter {
-    catch(exception: BadRequestException, host: ArgumentsHost) {
+@Catch(UnprocessableEntityException)
+export class UnprocessableEntityExceptionFilter implements ExceptionFilter {
+    catch(exception: UnprocessableEntityException, host: ArgumentsHost) {
         const messages = exception.getResponse()['message'];
         const response = host.switchToHttp().getResponse<Response>();
         const status = exception.getStatus();
