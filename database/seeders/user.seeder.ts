@@ -1,16 +1,23 @@
+import { faker } from '@faker-js/faker';
+import { Seeder } from '@jorgebodega/typeorm-seeding';
+import { hash } from 'common/util';
 import { User } from 'modules/user/user.entity';
 import { DataSource } from 'typeorm';
-import { Factory, Seeder } from 'typeorm-seeding';
 
-export default class UserSeeder implements Seeder {
-    public async run(factory: Factory, dataSource: DataSource): Promise<any> {
-        const users = await factory(User)().makeMany(1000);
+export default class UserSeeder extends Seeder {
+    async run(dataSource: DataSource): Promise<void> {
+        const users: User[] = [this.createRandomUser()];
 
-        await dataSource
-            .createQueryBuilder()
-            .insert()
-            .into(User)
-            .values(users)
-            .execute();
+        await dataSource.createEntityManager().save<User>(users);
+    }
+
+    private createRandomUser(): User {
+        const user = new User();
+
+        user.name = faker.name.firstName();
+        user.email = faker.internet.email();
+        user.password = hash('password');
+
+        return user;
     }
 }
